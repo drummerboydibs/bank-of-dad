@@ -4,12 +4,13 @@ import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
 import { callManageKids } from "../lib/api";
 import { SelectField, TextField } from "../components/form";
-import { Avatar, AccountGlyph, ColorPicker, EmojiPicker } from "../components/appearance";
+import { Avatar, AccountRow, ColorPicker, EmojiPicker } from "../components/appearance";
 import { Alert, EmptyState, Modal, Money, Spinner } from "../components/ui";
 import {
   ACCOUNT_TYPE_OPTIONS,
   BRAND_OPTIONS,
   DEFAULT_ACCOUNT_TYPE,
+  DEFAULT_COLOR_KEY,
   cardTint,
 } from "../lib/appearance";
 
@@ -121,14 +122,7 @@ export default function KidDetail() {
         <ul className="space-y-3">
           {accounts.map((a) => (
             <li key={a.account_id}>
-              <Link
-                to={`/app/account/${a.account_id}`}
-                className={`flex items-center gap-3 rounded-2xl border p-4 shadow-sm transition hover:shadow ${cardTint(a.color)}`}
-              >
-                <AccountGlyph accountType={a.account_type} brand={a.brand} color={a.color} />
-                <span className="min-w-0 flex-1 truncate font-medium">{a.name}</span>
-                <Money cents={a.balance_cents} className="font-semibold" />
-              </Link>
+              <AccountRow account={a} />
             </li>
           ))}
         </ul>
@@ -182,14 +176,14 @@ function AppearanceModal({
   initialAvatar: string | null;
   onSaved: () => void;
 }) {
-  const [color, setColor] = useState(initialColor ?? "slate");
+  const [color, setColor] = useState(initialColor ?? DEFAULT_COLOR_KEY);
   const [avatar, setAvatar] = useState<string | null>(initialAvatar);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   // Re-sync when a different kid / saved value flows in.
   useEffect(() => {
-    setColor(initialColor ?? "slate");
+    setColor(initialColor ?? DEFAULT_COLOR_KEY);
     setAvatar(initialAvatar);
   }, [initialColor, initialAvatar, open]);
 
@@ -242,7 +236,7 @@ function AddAccountModal({
 }) {
   const { user } = useAuth();
   const [name, setName] = useState("");
-  const [color, setColor] = useState("slate");
+  const [color, setColor] = useState(DEFAULT_COLOR_KEY);
   const [accountType, setAccountType] = useState(DEFAULT_ACCOUNT_TYPE);
   const [brand, setBrand] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -250,7 +244,7 @@ function AddAccountModal({
 
   function reset() {
     setName("");
-    setColor("slate");
+    setColor(DEFAULT_COLOR_KEY);
     setAccountType(DEFAULT_ACCOUNT_TYPE);
     setBrand("");
   }

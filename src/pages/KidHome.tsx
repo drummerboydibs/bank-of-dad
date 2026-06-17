@@ -1,21 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
-import { EmptyState, Money, Spinner } from "../components/ui";
+import { EmptyState, Spinner } from "../components/ui";
 import { AddToHomeScreenModal, isStandalone } from "../components/AddToHomeScreenModal";
-import { AccountGlyph } from "../components/appearance";
-import { cardTint } from "../lib/appearance";
+import { AccountRow, type AccountRowData } from "../components/appearance";
 import { formatCents } from "../lib/money";
 
-interface AccountBalance {
-  account_id: string;
-  name: string;
-  balance_cents: number;
-  color: string | null;
-  account_type: string | null;
-  brand: string | null;
-}
+type AccountBalance = AccountRowData;
 
 export default function KidHome() {
   const { member } = useAuth();
@@ -61,14 +52,7 @@ export default function KidHome() {
         <ul className="space-y-3">
           {accounts.map((a) => (
             <li key={a.account_id}>
-              <Link
-                to={`/app/account/${a.account_id}`}
-                className={`flex items-center gap-3 rounded-2xl border p-4 shadow-sm transition hover:shadow ${cardTint(a.color)}`}
-              >
-                <AccountGlyph accountType={a.account_type} brand={a.brand} color={a.color} />
-                <span className="min-w-0 flex-1 truncate font-medium">{a.name}</span>
-                <Money cents={a.balance_cents} className="font-semibold" />
-              </Link>
+              <AccountRow account={a} />
             </li>
           ))}
         </ul>

@@ -9,6 +9,7 @@ import {
   ACCOUNT_TYPE_OPTIONS,
   BRAND_OPTIONS,
   DEFAULT_ACCOUNT_TYPE,
+  DEFAULT_COLOR_KEY,
   cardTint,
 } from "../lib/appearance";
 import { formatCents, parseDollarsToCents } from "../lib/money";
@@ -250,7 +251,7 @@ function EditAccountModal({
   onSaved: () => void;
 }) {
   const [name, setName] = useState(initial.name);
-  const [color, setColor] = useState(initial.color ?? "slate");
+  const [color, setColor] = useState(initial.color ?? DEFAULT_COLOR_KEY);
   const [accountType, setAccountType] = useState(initial.account_type ?? DEFAULT_ACCOUNT_TYPE);
   const [brand, setBrand] = useState(initial.brand ?? "");
   const [error, setError] = useState<string | null>(null);
@@ -259,7 +260,7 @@ function EditAccountModal({
   // Re-sync the form whenever the account data changes or the modal reopens.
   useEffect(() => {
     setName(initial.name);
-    setColor(initial.color ?? "slate");
+    setColor(initial.color ?? DEFAULT_COLOR_KEY);
     setAccountType(initial.account_type ?? DEFAULT_ACCOUNT_TYPE);
     setBrand(initial.brand ?? "");
     setError(null);

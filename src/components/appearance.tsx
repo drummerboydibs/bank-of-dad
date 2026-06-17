@@ -1,8 +1,11 @@
+import { Link } from "react-router-dom";
+import { Money } from "./ui";
 import {
   AVATAR_EMOJIS,
   COLOR_OPTIONS,
   DEFAULT_COLOR_KEY,
   accountGlyph,
+  cardTint,
   colorOption,
   initials,
 } from "../lib/appearance";
@@ -55,6 +58,29 @@ export function AccountGlyph({
     >
       {accountGlyph(accountType, brand)}
     </span>
+  );
+}
+
+export interface AccountRowData {
+  account_id: string;
+  name: string;
+  balance_cents: number;
+  color: string | null;
+  account_type: string | null;
+  brand: string | null;
+}
+
+/** A tappable account card (glyph + name + balance), tinted by its color. */
+export function AccountRow({ account }: { account: AccountRowData }) {
+  return (
+    <Link
+      to={`/app/account/${account.account_id}`}
+      className={`flex items-center gap-3 rounded-2xl border p-4 shadow-sm transition hover:shadow ${cardTint(account.color)}`}
+    >
+      <AccountGlyph accountType={account.account_type} brand={account.brand} color={account.color} />
+      <span className="min-w-0 flex-1 truncate font-medium">{account.name}</span>
+      <Money cents={account.balance_cents} className="font-semibold" />
+    </Link>
   );
 }
 

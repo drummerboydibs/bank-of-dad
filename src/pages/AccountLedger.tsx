@@ -2,14 +2,24 @@ import { useEffect, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
-import { TextField } from "../components/form";
-import { Alert, EmptyState, Money, Spinner } from "../components/ui";
+import { SelectField, TextField } from "../components/form";
+import { AccountGlyph, ColorPicker } from "../components/appearance";
+import { Alert, EmptyState, Modal, Money, Spinner } from "../components/ui";
+import {
+  ACCOUNT_TYPE_OPTIONS,
+  BRAND_OPTIONS,
+  DEFAULT_ACCOUNT_TYPE,
+  cardTint,
+} from "../lib/appearance";
 import { formatCents, parseDollarsToCents } from "../lib/money";
 import { formatDate, todayInputValue } from "../lib/format";
 
 interface AccountInfo {
   name: string;
   balance_cents: number;
+  color: string | null;
+  account_type: string | null;
+  brand: string | null;
 }
 interface LedgerRow {
   id: string;
@@ -27,13 +37,14 @@ export default function AccountLedger() {
   const [account, setAccount] = useState<AccountInfo | null>(null);
   const [rows, setRows] = useState<LedgerRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showEdit, setShowEdit] = useState(false);
 
   async function load() {
     setLoading(true);
     const [{ data: acc }, { data: tx }] = await Promise.all([
       supabase
         .from("account_balances")
-        .select("name, balance_cents")
+        .select("name, balance_cents, color, account_type, brand")
         .eq("account_id", accountId)
         .maybeSingle(),
       supabase
@@ -74,12 +85,38 @@ export default function AccountLedger() {
         ← Home
       </Link>
 
-      <div className="card text-center">
-        <p className="text-sm text-slate-500">{account.name}</p>
+      <div className={`rounded-2xl border p-4 text-center shadow-sm ${cardTint(account.color)}`}>
+        <div className="mb-1 flex items-center justify-center gap-2">
+          <AccountGlyph
+            accountType={account.account_type}
+            brand={account.brand}
+            color={account.color}
+          />
+          <p className="text-sm font-medium text-slate-600">{account.name}</p>
+        </div>
         <Money cents={account.balance_cents} className="text-3xl font-bold" />
+        {isParent && (
+          <button
+            type="button"
+            className="mt-2 block w-full text-xs text-slate-500 underline-offset-2 hover:underline"
+            onClick={() => setShowEdit(true)}
+          >
+            Edit account
+          </button>
+        )}
       </div>
 
       {isParent && <AddMoneyForm accountId={accountId} onAdded={load} />}
+
+      {isParent && (
+        <EditAccountModal
+          open={showEdit}
+          onClose={() => setShowEdit(false)}
+          accountId={accountId}
+          initial={account}
+          onSaved={load}
+        />
+      )}
 
       <h2 className="font-semibold">History</h2>
       {rows.length === 0 ? (
@@ -196,5 +233,100 @@ function AddMoneyForm({ accountId, onAdded }: { accountId: string; onAdded: () =
         {busy ? <Spinner /> : direction === "in" ? "Add money" : "Subtract money"}
       </button>
     </form>
+  );
+}
+
+function EditAccountModal({
+  open,
+  onClose,
+  accountId,
+  initial,
+  onSaved,
+}: {
+  open: boolean;
+  onClose: () => void;
+  accountId: string;
+  initial: AccountInfo;
+  onSaved: () => void;
+}) {
+  const [name, setName] = useState(initial.name);
+  const [color, setColor] = useState(initial.color ?? "slate");
+  const [accountType, setAccountType] = useState(initial.account_type ?? DEFAULT_ACCOUNT_TYPE);
+  const [brand, setBrand] = useState(initial.brand ?? "");
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  // Re-sync the form whenever the account data changes or the modal reopens.
+  useEffect(() => {
+    setName(initial.name);
+    setColor(initial.color ?? "slate");
+    setAccountType(initial.account_type ?? DEFAULT_ACCOUNT_TYPE);
+    setBrand(initial.brand ?? "");
+    setError(null);
+  }, [initial, open]);
+
+  async function onSubmit(e: FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setBusy(true);
+    const { error } = await supabase
+      .from("accounts")
+      .update({
+        name: name.trim(),
+        color,
+        account_type: accountType,
+        brand: accountType === "gift_card" && brand ? brand : null,
+      })
+      .eq("id", accountId);
+    setBusy(false);
+    if (error) {
+      setError(
+        /duplicate|unique/i.test(error.message)
+          ? "An account with that name already exists for this kid."
+          : error.message,
+      );
+      return;
+    }
+    onSaved();
+    onClose();
+  }
+
+  return (
+    <Modal open={open} onClose={onClose} title="Edit account">
+      <form onSubmit={onSubmit} className="space-y-4">
+        {error && <Alert>{error}</Alert>}
+        <TextField
+          label="Account name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+        <SelectField
+          label="Type"
+          value={accountType}
+          onChange={(e) => setAccountType(e.target.value)}
+        >
+          {ACCOUNT_TYPE_OPTIONS.map((t) => (
+            <option key={t.key} value={t.key}>
+              {t.icon} {t.label}
+            </option>
+          ))}
+        </SelectField>
+        {accountType === "gift_card" && (
+          <SelectField label="Brand" value={brand} onChange={(e) => setBrand(e.target.value)}>
+            <option value="">No brand</option>
+            {BRAND_OPTIONS.map((b) => (
+              <option key={b.key} value={b.key}>
+                {b.icon} {b.label}
+              </option>
+            ))}
+          </SelectField>
+        )}
+        <ColorPicker value={color} onChange={setColor} />
+        <button className="btn btn-primary w-full" disabled={busy}>
+          {busy ? <Spinner /> : "Save changes"}
+        </button>
+      </form>
+    </Modal>
   );
 }

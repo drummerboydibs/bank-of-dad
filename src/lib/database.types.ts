@@ -14,6 +14,9 @@ export type Database = {
     Tables: {
       accounts: {
         Row: {
+          account_type: string
+          brand: string | null
+          color: string | null
           created_at: string
           created_by: string | null
           household_id: string
@@ -22,6 +25,9 @@ export type Database = {
           name: string
         }
         Insert: {
+          account_type?: string
+          brand?: string | null
+          color?: string | null
           created_at?: string
           created_by?: string | null
           household_id: string
@@ -30,6 +36,9 @@ export type Database = {
           name: string
         }
         Update: {
+          account_type?: string
+          brand?: string | null
+          color?: string | null
           created_at?: string
           created_by?: string | null
           household_id?: string
@@ -49,6 +58,8 @@ export type Database = {
       }
       household_members: {
         Row: {
+          avatar: string | null
+          color: string | null
           created_at: string
           display_name: string
           household_id: string
@@ -58,6 +69,8 @@ export type Database = {
           username: string | null
         }
         Insert: {
+          avatar?: string | null
+          color?: string | null
           created_at?: string
           display_name: string
           household_id: string
@@ -67,6 +80,8 @@ export type Database = {
           username?: string | null
         }
         Update: {
+          avatar?: string | null
+          color?: string | null
           created_at?: string
           display_name?: string
           household_id?: string
@@ -209,7 +224,10 @@ export type Database = {
       account_balances: {
         Row: {
           account_id: string | null
+          account_type: string | null
           balance_cents: number | null
+          brand: string | null
+          color: string | null
           household_id: string | null
           kid_user_id: string | null
           last_activity_at: string | null
@@ -269,6 +287,10 @@ export type Database = {
       redeem_invite: {
         Args: { p_display_name?: string; p_token: string }
         Returns: string
+      }
+      set_member_appearance: {
+        Args: { p_avatar: string | null; p_color: string; p_user_id: string }
+        Returns: undefined
       }
       setup_parent_account: {
         Args: { p_display_name: string; p_household_name: string }

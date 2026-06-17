@@ -4,12 +4,17 @@ import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
 import { EmptyState, Money, Spinner } from "../components/ui";
 import { AddToHomeScreenModal, isStandalone } from "../components/AddToHomeScreenModal";
+import { AccountGlyph } from "../components/appearance";
+import { cardTint } from "../lib/appearance";
 import { formatCents } from "../lib/money";
 
 interface AccountBalance {
   account_id: string;
   name: string;
   balance_cents: number;
+  color: string | null;
+  account_type: string | null;
+  brand: string | null;
 }
 
 export default function KidHome() {
@@ -22,7 +27,7 @@ export default function KidHome() {
     (async () => {
       const { data } = await supabase
         .from("account_balances")
-        .select("account_id, name, balance_cents")
+        .select("account_id, name, balance_cents, color, account_type, brand")
         .order("name");
       setAccounts((data ?? []) as AccountBalance[]);
       setLoading(false);
@@ -58,9 +63,10 @@ export default function KidHome() {
             <li key={a.account_id}>
               <Link
                 to={`/app/account/${a.account_id}`}
-                className="card flex items-center justify-between hover:border-green-300"
+                className={`flex items-center gap-3 rounded-2xl border p-4 shadow-sm transition hover:shadow ${cardTint(a.color)}`}
               >
-                <span className="font-medium">{a.name}</span>
+                <AccountGlyph accountType={a.account_type} brand={a.brand} color={a.color} />
+                <span className="min-w-0 flex-1 truncate font-medium">{a.name}</span>
                 <Money cents={a.balance_cents} className="font-semibold" />
               </Link>
             </li>

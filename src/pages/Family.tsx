@@ -3,8 +3,10 @@ import { Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
 import AddKidModal from "../components/AddKidModal";
+import { Avatar } from "../components/appearance";
 import { TextField } from "../components/form";
 import { Alert, EmptyState, Modal, Spinner } from "../components/ui";
+import { cardTint } from "../lib/appearance";
 import { formatDate } from "../lib/format";
 
 interface MemberRow {
@@ -12,6 +14,8 @@ interface MemberRow {
   display_name: string;
   role: string;
   username: string | null;
+  color: string | null;
+  avatar: string | null;
 }
 interface InviteRow {
   id: string;
@@ -39,7 +43,7 @@ export default function Family() {
     const [{ data: m }, { data: inv }] = await Promise.all([
       supabase
         .from("household_members")
-        .select("user_id, display_name, role, username")
+        .select("user_id, display_name, role, username, color, avatar")
         .order("role"),
       supabase
         .from("invites")
@@ -129,10 +133,13 @@ export default function Family() {
               <li key={k.user_id}>
                 <Link
                   to={`/app/kid/${k.user_id}`}
-                  className="card flex items-center justify-between py-3 hover:border-green-300"
+                  className={`flex items-center gap-3 rounded-2xl border p-4 shadow-sm transition hover:shadow ${cardTint(k.color)}`}
                 >
-                  <span className="font-medium">{k.display_name}</span>
-                  <span className="text-xs text-slate-500">@{k.username}</span>
+                  <Avatar name={k.display_name} color={k.color} avatar={k.avatar} />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-medium">{k.display_name}</span>
+                    <span className="block truncate text-xs text-slate-500">@{k.username}</span>
+                  </span>
                 </Link>
               </li>
             ))}

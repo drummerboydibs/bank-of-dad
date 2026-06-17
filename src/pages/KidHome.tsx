@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
 import { EmptyState, Money, Spinner } from "../components/ui";
+import { AddToHomeScreenModal, isStandalone } from "../components/AddToHomeScreenModal";
 import { formatCents } from "../lib/money";
 
 interface AccountBalance {
@@ -15,6 +16,7 @@ export default function KidHome() {
   const { member } = useAuth();
   const [accounts, setAccounts] = useState<AccountBalance[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showInstall, setShowInstall] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -65,6 +67,25 @@ export default function KidHome() {
           ))}
         </ul>
       )}
+
+      {!isStandalone() && (
+        <button
+          className="card flex w-full items-center justify-between text-left hover:border-green-300"
+          onClick={() => setShowInstall(true)}
+        >
+          <span>
+            <span className="font-medium">Put Bank of Dad on your home screen</span>
+            <span className="block text-sm text-slate-500">
+              So it opens like a real app. Tap to see how!
+            </span>
+          </span>
+          <span aria-hidden="true" className="text-xl">
+            📲
+          </span>
+        </button>
+      )}
+
+      <AddToHomeScreenModal open={showInstall} onClose={() => setShowInstall(false)} />
     </div>
   );
 }

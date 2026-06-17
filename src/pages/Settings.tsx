@@ -4,6 +4,7 @@ import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
 import { TextField } from "../components/form";
 import { Alert, Spinner } from "../components/ui";
+import { AddToHomeScreenModal, isStandalone } from "../components/AddToHomeScreenModal";
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ export default function Settings() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [showInstall, setShowInstall] = useState(false);
 
   async function saveName(e: FormEvent) {
     e.preventDefault();
@@ -58,6 +60,23 @@ export default function Settings() {
         <p className="text-sm text-slate-500">{user?.email}</p>
       </div>
 
+      {!isStandalone() && (
+        <button
+          className="card flex w-full items-center justify-between text-left hover:border-green-300"
+          onClick={() => setShowInstall(true)}
+        >
+          <span>
+            <span className="font-medium">Add to Home Screen</span>
+            <span className="block text-sm text-slate-500">
+              Install the app for one-tap, full-screen access.
+            </span>
+          </span>
+          <span aria-hidden="true" className="text-xl">
+            📲
+          </span>
+        </button>
+      )}
+
       <button
         className="btn btn-secondary w-full"
         onClick={async () => {
@@ -67,6 +86,8 @@ export default function Settings() {
       >
         Sign out
       </button>
+
+      <AddToHomeScreenModal open={showInstall} onClose={() => setShowInstall(false)} />
     </div>
   );
 }

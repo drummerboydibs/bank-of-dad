@@ -14,7 +14,10 @@ export default function Layout() {
   const isParent = role === "parent";
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-2xl flex-col">
+    // Full-width frame. The bars below span the whole viewport while their
+    // contents stay centered at max-w-2xl, so on wide desktop windows the
+    // header/footer read as intentional app bars instead of cut-off strips.
+    <div className="flex min-h-screen flex-col">
       <a
         href="#main-content"
         onClick={(e) => {
@@ -30,56 +33,64 @@ export default function Layout() {
         Skip to content
       </a>
 
-      <header className="sticky top-0 z-10 flex items-center gap-2 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur">
-        <img src={`${import.meta.env.BASE_URL}icon.svg`} alt="" className="h-7 w-7" />
-        <div className="min-w-0">
-          <p className="truncate text-sm font-semibold leading-tight">
-            {householdName ?? "Bank of Dad"}
-          </p>
-          <p className="truncate text-xs leading-tight text-slate-600">
-            {member?.display_name}
-            {isParent ? " · Parent" : " · Kid"}
-          </p>
+      <header className="sticky top-0 z-10 border-b border-slate-200 bg-white/90 backdrop-blur">
+        <div className="mx-auto flex max-w-2xl items-center gap-2 px-4 py-3">
+          <img src={`${import.meta.env.BASE_URL}icon.svg`} alt="" className="h-7 w-7" />
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold leading-tight">
+              {householdName ?? "Bank of Dad"}
+            </p>
+            <p className="truncate text-xs leading-tight text-slate-600">
+              {member?.display_name}
+              {isParent ? " · Parent" : " · Kid"}
+            </p>
+          </div>
         </div>
       </header>
 
-      <main id="main-content" tabIndex={-1} className="flex-1 px-4 py-4 pb-24 focus:outline-none">
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="mx-auto w-full max-w-2xl flex-1 px-4 py-4 pb-24 focus:outline-none"
+      >
         <Outlet />
       </main>
 
       <nav
         aria-label="Primary"
-        className="fixed inset-x-0 bottom-0 z-10 mx-auto flex max-w-2xl border-t border-slate-200 bg-white/95 backdrop-blur"
+        className="fixed inset-x-0 bottom-0 z-10 border-t border-slate-200 bg-white/95 backdrop-blur"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
-        <NavLink to="/app" end className={tabClass}>
-          <span className="text-xl" aria-hidden="true">
-            🏠
-          </span>
-          Home
-        </NavLink>
-        <NavLink to="/app/reports" className={tabClass}>
-          <span className="text-xl" aria-hidden="true">
-            📊
-          </span>
-          {isParent ? "Reports" : "History"}
-        </NavLink>
-        {isParent && (
-          <NavLink to="/app/family" className={tabClass}>
+        <div className="mx-auto flex max-w-2xl">
+          <NavLink to="/app" end className={tabClass}>
             <span className="text-xl" aria-hidden="true">
-              👪
+              🏠
             </span>
-            Family
+            Home
           </NavLink>
-        )}
-        {isParent && (
-          <NavLink to="/app/settings" className={tabClass}>
+          <NavLink to="/app/reports" className={tabClass}>
             <span className="text-xl" aria-hidden="true">
-              ⚙️
+              📊
             </span>
-            Settings
+            {isParent ? "Reports" : "History"}
           </NavLink>
-        )}
+          {isParent && (
+            <NavLink to="/app/family" className={tabClass}>
+              <span className="text-xl" aria-hidden="true">
+                👪
+              </span>
+              Family
+            </NavLink>
+          )}
+          {isParent && (
+            <NavLink to="/app/settings" className={tabClass}>
+              <span className="text-xl" aria-hidden="true">
+                ⚙️
+              </span>
+              Settings
+            </NavLink>
+          )}
+        </div>
       </nav>
     </div>
   );

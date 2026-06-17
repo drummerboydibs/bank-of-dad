@@ -4,7 +4,9 @@ import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
 import AuthShell from "../components/AuthShell";
 import { TextField } from "../components/form";
+import { HouseholdFields } from "../components/HouseholdFields";
 import { Alert, Spinner } from "../components/ui";
+import { clearPendingHousehold, savePendingHousehold } from "../lib/pendingHousehold";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -34,7 +36,13 @@ export default function SignUp() {
     }
 
     if (!data.session) {
-      // Email confirmation is turned on for this project.
+      // Email confirmation is turned on for this project, so there's no session
+      // to run setup_parent_account against yet. Stash what they typed so the
+      // /setup form pre-fills it after they confirm and log in.
+      savePendingHousehold({
+        parentName: parentName.trim(),
+        householdName: householdName.trim(),
+      });
       setBusy(false);
       setNotice(
         "Account created! Check your email to confirm, then log in to finish setting up your family.",
@@ -52,6 +60,7 @@ export default function SignUp() {
       setError(rpcError.message);
       return;
     }
+    clearPendingHousehold();
     await refreshMember();
     setBusy(false);
     navigate("/app");
@@ -69,19 +78,11 @@ export default function SignUp() {
             </Link>
           </Alert>
         )}
-        <TextField
-          label="Your name"
-          value={parentName}
-          onChange={(e) => setParentName(e.target.value)}
-          placeholder="e.g. Dad"
-          required
-        />
-        <TextField
-          label="Family name"
-          value={householdName}
-          onChange={(e) => setHouseholdName(e.target.value)}
-          placeholder="e.g. The Smith Family"
-          required
+        <HouseholdFields
+          parentName={parentName}
+          householdName={householdName}
+          onParentName={setParentName}
+          onHouseholdName={setHouseholdName}
         />
         <TextField
           label="Email"

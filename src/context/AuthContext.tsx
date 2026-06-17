@@ -96,8 +96,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [loadMember]);
 
   const refreshMember = useCallback(async () => {
-    await loadMember(session?.user?.id);
-  }, [loadMember, session]);
+    // Read the live session straight from the client rather than the closed-over
+    // React state. Right after sign-up the SignUp page still holds a callback
+    // captured while logged out (session === null), so relying on the closure
+    // would query `loadMember(undefined)` and wipe the membership we just created.
+    const { data } = await supabase.auth.getSession();
+    await loadMember(data.session?.user?.id);
+  }, [loadMember]);
 
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();

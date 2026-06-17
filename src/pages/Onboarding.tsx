@@ -3,14 +3,18 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
 import AuthShell from "../components/AuthShell";
-import { TextField } from "../components/form";
+import { HouseholdFields } from "../components/HouseholdFields";
 import { Alert, FullPageSpinner, Spinner } from "../components/ui";
+import { clearPendingHousehold, readPendingHousehold } from "../lib/pendingHousehold";
 
 export default function Onboarding() {
   const navigate = useNavigate();
   const { loading, session, member, refreshMember, signOut } = useAuth();
-  const [parentName, setParentName] = useState("");
-  const [householdName, setHouseholdName] = useState("");
+  // Pre-fill from what they typed on SignUp before email confirmation.
+  const [parentName, setParentName] = useState(() => readPendingHousehold()?.parentName ?? "");
+  const [householdName, setHouseholdName] = useState(
+    () => readPendingHousehold()?.householdName ?? "",
+  );
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -31,6 +35,7 @@ export default function Onboarding() {
       setError(error.message);
       return;
     }
+    clearPendingHousehold();
     await refreshMember();
     setBusy(false);
     navigate("/app");
@@ -40,19 +45,11 @@ export default function Onboarding() {
     <AuthShell title="Set up your family" subtitle="Just a couple details to get started.">
       <form onSubmit={onSubmit} className="space-y-4">
         {error && <Alert>{error}</Alert>}
-        <TextField
-          label="Your name"
-          value={parentName}
-          onChange={(e) => setParentName(e.target.value)}
-          placeholder="e.g. Dad"
-          required
-        />
-        <TextField
-          label="Family name"
-          value={householdName}
-          onChange={(e) => setHouseholdName(e.target.value)}
-          placeholder="e.g. The Smith Family"
-          required
+        <HouseholdFields
+          parentName={parentName}
+          householdName={householdName}
+          onParentName={setParentName}
+          onHouseholdName={setHouseholdName}
         />
         <button className="btn btn-primary w-full" disabled={busy}>
           {busy ? <Spinner /> : "Continue"}

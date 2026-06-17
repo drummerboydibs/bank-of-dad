@@ -50,7 +50,10 @@ begin
 end;
 $$;
 
--- Mirror the project's RPC hardening: no implicit public execute, only
--- authenticated callers (the body still enforces the parent + household check).
+-- Mirror the project's RPC hardening: only authenticated callers (the body
+-- still enforces the parent + household check). Supabase default privileges
+-- auto-grant EXECUTE to anon + authenticated on new functions, so revoking
+-- from PUBLIC is not enough — anon must be revoked explicitly.
 revoke all     on function public.set_member_appearance(uuid, text, text) from public;
+revoke execute on function public.set_member_appearance(uuid, text, text) from anon;
 grant  execute on function public.set_member_appearance(uuid, text, text) to authenticated;

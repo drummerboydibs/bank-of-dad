@@ -9,10 +9,12 @@ provisioned through the Supabase MCP. Its applied history is:
 | 20260617060533   | harden_security_definer_helpers |
 | 20260617060646   | revoke_public_execute_on_rpcs   |
 
-## Draft migrations (NOT yet applied)
+## Applied migrations for #2–#4
 
-These were written for review and are **not** applied to the live project. They
-back the three schema-changing enhancement issues:
+These back the three schema-changing enhancement issues and **have been applied**
+to the live project (the live history also includes a follow-up
+`restore_account_balances_security_invoker` migration, whose fix is folded into
+the view definitions below):
 
 | file                                    | issue | what it adds                                                        |
 | --------------------------------------- | ----- | ------------------------------------------------------------------- |
@@ -32,10 +34,13 @@ back the three schema-changing enhancement issues:
 - **Palette/brand values are app-owned.** `color` and `brand` are free text; the
   set of valid keys lives in the frontend. `account_type` is constrained by a DB
   CHECK because the UI branches on it.
+- **`account_balances` must keep `security_invoker = true`.** `CREATE OR REPLACE
+  VIEW` silently drops view options, so each recreation re-declares it.
+  Without it the view runs as owner and bypasses RLS, leaking every household's
+  balances — the Supabase security linter flags this as an ERROR.
 
-### After applying
+### Already done
 
-1. Regenerate types into `src/lib/database.types.ts`
-   (`generate_typescript_types` MCP tool, or `supabase gen types`).
-2. Build the matching frontend (avatar/color pickers on Family + KidDetail,
-   account color/type pickers on KidDetail) — deferred until the schema lands.
+1. Types regenerated into `src/lib/database.types.ts`.
+2. Frontend built: per-kid color/emoji on Family + KidDetail; account color and
+   type/brand pickers on KidDetail.

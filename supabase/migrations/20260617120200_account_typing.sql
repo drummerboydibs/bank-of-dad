@@ -26,7 +26,9 @@ comment on column public.accounts.brand is
   'pick a brand icon. NULL for other types.';
 
 -- Re-create the balances view with the typing columns appended after `color`.
-create or replace view public.account_balances as
+-- Keep security_invoker = true so the view enforces the querying user's RLS.
+create or replace view public.account_balances
+  with (security_invoker = true) as
  SELECT a.id AS account_id,
     a.household_id,
     a.kid_user_id,

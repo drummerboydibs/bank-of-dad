@@ -18,7 +18,10 @@ comment on column public.accounts.color is
 -- Surface the new column on the balances view the Kids' page reads. The column
 -- is appended at the END so CREATE OR REPLACE VIEW stays valid (it may add
 -- trailing columns but cannot rename/reorder existing ones).
-create or replace view public.account_balances as
+-- security_invoker = true is REQUIRED so the view enforces the querying user's
+-- RLS (without it the view runs as owner and leaks every household's balances).
+create or replace view public.account_balances
+  with (security_invoker = true) as
  SELECT a.id AS account_id,
     a.household_id,
     a.kid_user_id,

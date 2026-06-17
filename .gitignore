@@ -1,0 +1,13 @@
+node_modules
+dist
+dist-ssr
+*.local
+.env
+.env.*
+.DS_Store
+*.log
+.vite
+*.tsbuildinfo
+
+# Local, machine-specific Claude Code settings
+.claude/settings.local.json

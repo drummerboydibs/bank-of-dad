@@ -1,0 +1,18 @@
+{
+  "name": "Bank of Dad",
+  "short_name": "Bank of Dad",
+  "description": "A family bank for tracking kids' account balances and allowance.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#15803d",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

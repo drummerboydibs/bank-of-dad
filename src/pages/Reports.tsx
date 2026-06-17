@@ -161,19 +161,26 @@ export default function Reports() {
             </option>
           ))}
         </SelectField>
-        <div className="grid grid-cols-2 gap-2">
-          <TextField
-            label="From"
-            type="date"
-            value={from}
-            onChange={(e) => setFrom(e.target.value)}
-          />
-          <TextField
-            label="To"
-            type="date"
-            value={to}
-            onChange={(e) => setTo(e.target.value)}
-          />
+        {/* min-w-0 lets each column shrink below the date input's intrinsic
+            width; without it the native date fields overflow and overlap on
+            narrow screens. */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="min-w-0">
+            <TextField
+              label="From"
+              type="date"
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
+            />
+          </div>
+          <div className="min-w-0">
+            <TextField
+              label="To"
+              type="date"
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+            />
+          </div>
         </div>
         <TextField
           label="Search"

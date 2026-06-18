@@ -40,7 +40,9 @@ export default function Settings() {
     <div className="space-y-6">
       <h1 className="text-xl font-bold">Settings</h1>
 
-      {member && <AppearanceCard member={member} onSaved={refreshMember} />}
+      {/* Only kids have tiles/cards that show their avatar + color, so the
+          "Your look" control is meaningless for parents (issue #17). */}
+      {member && !isParent && <AppearanceCard member={member} onSaved={refreshMember} />}
 
       {isParent && (
         <form onSubmit={saveName} className="card space-y-3">

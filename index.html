@@ -3,7 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="%BASE_URL%icon.svg" />
-    <link rel="apple-touch-icon" href="%BASE_URL%icon.svg" />
+    <!-- iOS Home Screen uses apple-touch-icon and does NOT support SVG; without a
+         PNG here iOS falls back to an icon from the domain root. -->
+    <link rel="apple-touch-icon" sizes="180x180" href="%BASE_URL%apple-touch-icon-180.png" />
     <link rel="manifest" href="%BASE_URL%manifest.webmanifest" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#15803d" />

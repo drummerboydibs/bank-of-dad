@@ -18,6 +18,8 @@ export interface Member {
   role: Role;
   display_name: string;
   username: string | null;
+  color: string | null;
+  avatar: string | null;
 }
 
 interface AuthState {
@@ -47,7 +49,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     const { data, error } = await supabase
       .from("household_members")
-      .select("id, household_id, user_id, role, display_name, username, households(name)")
+      .select(
+        "id, household_id, user_id, role, display_name, username, color, avatar, households(name)",
+      )
       .eq("user_id", userId)
       .maybeSingle();
     if (error || !data) {
@@ -67,6 +71,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       role: row.role as Role,
       display_name: row.display_name as string,
       username: (row.username as string | null) ?? null,
+      color: (row.color as string | null) ?? null,
+      avatar: (row.avatar as string | null) ?? null,
     });
     setHouseholdName(row.households?.name ?? null);
   }, []);

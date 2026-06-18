@@ -27,10 +27,11 @@ export default function App() {
           <Route path="/app" element={<Home />} />
           <Route path="/app/reports" element={<Reports />} />
           <Route path="/app/account/:accountId" element={<AccountLedger />} />
+          {/* Settings is for everyone (kids manage their look + sign out here). */}
+          <Route path="/app/settings" element={<Settings />} />
           <Route element={<RequireParent />}>
             <Route path="/app/kid/:kidId" element={<KidDetail />} />
             <Route path="/app/family" element={<Family />} />
-            <Route path="/app/settings" element={<Settings />} />
           </Route>
         </Route>
       </Route>

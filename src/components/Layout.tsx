@@ -82,14 +82,12 @@ export default function Layout() {
               Family
             </NavLink>
           )}
-          {isParent && (
-            <NavLink to="/app/settings" className={tabClass}>
-              <span className="text-xl" aria-hidden="true">
-                ⚙️
-              </span>
-              Settings
-            </NavLink>
-          )}
+          <NavLink to="/app/settings" className={tabClass}>
+            <span className="text-xl" aria-hidden="true">
+              ⚙️
+            </span>
+            Settings
+          </NavLink>
         </div>
       </nav>
     </div>

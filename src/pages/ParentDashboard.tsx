@@ -2,12 +2,16 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { EmptyState, Money, Spinner } from "../components/ui";
+import { Avatar } from "../components/appearance";
+import { cardTint } from "../lib/appearance";
 import AddKidModal from "../components/AddKidModal";
 
 interface KidRow {
   user_id: string;
   display_name: string;
   username: string | null;
+  color: string | null;
+  avatar: string | null;
 }
 
 export default function ParentDashboard() {
@@ -22,7 +26,7 @@ export default function ParentDashboard() {
     const [{ data: kidData }, { data: balData }] = await Promise.all([
       supabase
         .from("household_members")
-        .select("user_id, display_name, username")
+        .select("user_id, display_name, username, color, avatar")
         .eq("role", "kid")
         .order("display_name"),
       supabase.from("account_balances").select("kid_user_id, balance_cents"),
@@ -67,9 +71,10 @@ export default function ParentDashboard() {
               <li key={kid.user_id}>
                 <Link
                   to={`/app/kid/${kid.user_id}`}
-                  className="card flex items-center justify-between hover:border-green-300"
+                  className={`flex items-center gap-3 rounded-2xl border p-4 shadow-sm transition hover:shadow ${cardTint(kid.color)}`}
                 >
-                  <div className="min-w-0">
+                  <Avatar name={kid.display_name} color={kid.color} avatar={kid.avatar} />
+                  <div className="min-w-0 flex-1">
                     <p className="font-semibold">{kid.display_name}</p>
                     <p className="truncate text-xs text-slate-500">
                       @{kid.username} · {n} account{n === 1 ? "" : "s"}

@@ -84,6 +84,16 @@ export function Modal({
   const titleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
 
+  // Keep the latest onClose without making it an effect dependency. Otherwise
+  // callers passing a fresh inline onClose each render would re-run the setup
+  // effect on every keystroke, which re-focuses the dialog and dismisses the
+  // mobile keyboard mid-typing.
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  });
+
+  // Runs only when the dialog opens/closes — not on every re-render.
   useEffect(() => {
     if (!open) return;
     const previouslyFocused = document.activeElement as HTMLElement | null;
@@ -95,7 +105,7 @@ export function Modal({
 
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") {
-        onClose();
+        onCloseRef.current();
         return;
       }
       if (e.key !== "Tab" || !dialog) return;
@@ -121,7 +131,7 @@ export function Modal({
       document.body.style.overflow = prevOverflow;
       previouslyFocused?.focus?.();
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open) return null;
   return createPortal(

@@ -40,6 +40,15 @@
       placeholder:text-slate-400 focus:border-green-600 focus:outline-none
       focus:ring-2 focus:ring-green-600/30;
   }
+  /* iOS Safari gives date/time inputs a UA-defined intrinsic width and
+     ignores width:100%, so they overflow their container (e.g. the From/To
+     fields spilling past the Reports card). Reset the native appearance and
+     drop the min-width so they honor the box-sizing width like other inputs. */
+  input[type="date"].input,
+  input[type="time"].input,
+  input[type="datetime-local"].input {
+    @apply min-w-0 max-w-full appearance-none;
+  }
   .label {
     @apply mb-1 block text-sm font-medium text-slate-700;
   }

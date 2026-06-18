@@ -161,10 +161,13 @@ export default function Reports() {
             </option>
           ))}
         </SelectField>
-        {/* min-w-0 lets each column shrink below the date input's intrinsic
-            width; without it the native date fields overflow and overlap on
-            narrow screens. */}
-        <div className="grid grid-cols-2 gap-3">
+        {/* Stack From/To on phones and only go two-up once there's room
+            (sm+). Native date inputs have an intrinsic minimum width — the
+            date text plus the calendar/spinner controls — that w-full can't
+            shrink below, so forcing two columns on narrow screens squeezes
+            them until they overlap. min-w-0 still lets the two-up tracks
+            shrink on larger screens. */}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="min-w-0">
             <TextField
               label="From"

@@ -45,7 +45,7 @@ export default function SignUp() {
       });
       setBusy(false);
       setNotice(
-        "Account created! Check your email to confirm, then log in to finish setting up your family.",
+        "Account created! Check your email from our partner Supabase to confirm, then log in to finish setting up your family.",
       );
       return;
     }

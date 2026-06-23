@@ -53,7 +53,7 @@ export default function Join() {
       return;
     }
     if (mode === "signup" && !data.session) {
-      setAuthError("Account created! Confirm your email, then reopen this link to join.");
+      setAuthError("Account created! Confirm your email from our partner Supabase, then reopen this link to join.");
       return;
     }
     // The session is now active; onAuthStateChange re-renders to the accept step.
